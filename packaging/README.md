@@ -193,7 +193,7 @@ module "lambda_image" {
 ## Related Projects
 
 - [lambda-shell-runtime](https://github.com/ql4b/lambda-shell-runtime) - Custom Lambda runtime for Bash functions
-- [echo service](https://github.com/ql4b/echo) - Configurable echo API for load testing
+<!-- - [echo service](https://github.com/ql4b/echo) - Configurable echo API for load testing -->
 
 ## License
 
