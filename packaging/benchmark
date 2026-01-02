@@ -1,0 +1,78 @@
+#!/bin/bash
+
+FUNCTION_NAME="cloudless-lambda-os-only-lab-function"
+# FUNCTION_NAME="cloudless-lambda-os-only-lab-image"
+INVOKE_SCRIPT="invoke"
+
+report () {
+    local SINCE
+    local FUNCTION_NAME
+    SINCE=${1:-"1m"}
+    FUNCTION_NAME="${2:-$FUNCTION_NAME}"
+    echo "Fetching logs for function: $FUNCTION_NAME since $SINCE" >&2
+    aws logs tail \
+     --since "$SINCE"  \
+     --format short "/aws/lambda/$FUNCTION_NAME" \
+    | grep REPORT
+}
+
+init_stats () {
+    local SINCE="${1:-1m}"
+    local FUNCTION_NAME="${2:-$FUNCTION_NAME}"
+    local DATA="${3:-$(report "$SINCE" "$FUNCTION_NAME")}"
+    local INIT
+    INIT=$(mktemp)
+    # echo "$DATA"
+    echo "$DATA"  \
+         | grep -o -E  'Init Duration: (.+) ms' \
+         | cut -d' ' -f 3 \
+    > "$INIT"
+    # echo "$INIT"
+    
+     init_count=$(wc -l "$INIT" | awk '{ print $1 }') && \
+     init_total=$(paste -s -d + "$INIT" | bc) && \
+     init_average=$(echo "scale=2; $init_total/$init_count" | bc)
+
+    jq -n --arg init_count "$init_count" \
+         --arg init_total "$init_total" \
+         --arg init_average "$init_average" '
+    {
+        "init_count": '"$init_count"',
+        "init_total_ms": '"$init_total"',
+        "init_average_ms": '"$init_average"'
+    }'
+}
+
+# Invoke with changing env var
+benchmark () { 
+    local FUNCTION_NAME="${1:-$FUNCTION_NAME}"
+    local SINCE
+    SINCE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    # for i in {1..50}; do
+    #     aws lambda update-function-configuration \
+    #         --function-name "$FUNCTION_NAME" \
+    #         --environment "Variables={BENCH_RUN=$i}" 1>/dev/null 2>/dev/stdout
+
+    #     sleep 3 # wait for config to propagate
+    #     aws lambda invoke --function-name "$FUNCTION_NAME" /dev/stdout 1>/dev/null 2>/dev/stdout
+    # done
+    # echo "$INVOKE_SCRIPT"
+
+    aws lambda update-function-configuration \
+        --function-name "$FUNCTION_NAME" \
+        --environment "Variables={BENCH_RUN=$SINCE}" 1>/dev/null 2>/dev/stdout
+
+    echo "Waiting 3s for config to propagate..."
+    sleep 3 # wait for config to propagate
+
+    echo "Invoking function $FUNCTION_NAME concurrently..."
+    export FUNCTION_NAME
+    seq 1 120 | parallel -j 60 "$INVOKE_SCRIPT"
+        # aws lambda invoke --function-name "$FUNCTION_NAME" /dev/stdout 1>/dev/null 2>/dev/stdout
+
+    echo "Waiting 30s for logs to propagate..."
+    sleep 10
+    # echo "Since: $SINCE"
+    echo "Init stats since $SINCE :"
+    init_stats "$SINCE" | tee "data/$FUNCTION_NAME-init-stats.json"
+}

@@ -1,0 +1,9 @@
+{
+  "init_count": 60,
+  "init_total_ms": 2557.03,
+  "init_average_ms": 42.61,
+  "p20_ms": 40.41,
+  "p40_ms": 40.92,
+  "p60_ms": 41.16,
+  "p80_ms": 47.30
+}

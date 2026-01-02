@@ -1,0 +1,5 @@
+#!/bin/bash
+
+docker buildx build --platform linux/arm64 \
+    -t "$(tf output -json runtime | jq -r .image.name)" \
+    --push .
