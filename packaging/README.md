@@ -2,7 +2,7 @@
 
 > **Benchmarking Lambda cold start performance: Container images vs ZIP packages**
 
-This repository contains the benchmark code and results for the blog post ["When Container Images Beat ZIP Packages: Lambda Cold Start Surprises"](https://cloudless.sh/log/lambda-container-images-beat-zip-packages).
+This repository contains the benchmark code and results for the blog post ["When Container Images Beat ZIP Packages: Lambda Cold Start Surprises"](https://cloudless.sh/log/lambda-container-images-beat-zip-packages/).
 
 ## Overview
 
