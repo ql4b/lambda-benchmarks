@@ -4,7 +4,7 @@
 run () {
     # curl -sS \
     #     httpbin.org/get 
-    sleep 10  # Force Lambda to spin up new containers for concurrent requests
+    sleep 5  # Force Lambda to spin up new containers for concurrent requests
     echo "Hello World!"
 }
 

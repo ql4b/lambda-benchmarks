@@ -5,5 +5,5 @@ FUNCTION_NAME="${FUNCTION_NAME:-"cloudless-lambda-os-only-lab-function"}"
 # echo "$FUNCTION_NAME" >&2
 
 aws lambda invoke \
-    --function-name "$FUNCTION_NAME" /dev/stdout  \
+    --function-name "$FUNCTION_NAME" /dev/stdout   \
     1>/dev/null 2>/dev/stdout
