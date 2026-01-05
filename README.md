@@ -13,7 +13,7 @@ Container images vs ZIP packages for Lambda cold start performance. **Key findin
 - **Container Image**: 33.51ms average init time
 - **Improvement**: 21% faster cold starts
 
-Read the full analysis](https://cloudless.sh/log/lambda-container-images-beat-zip-packages/)
+[Read the full analysis](https://cloudless.sh/log/lambda-container-images-beat-zip-packages/)
 
 ## Planned Benchmarks
 
