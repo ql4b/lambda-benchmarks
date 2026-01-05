@@ -30,7 +30,7 @@ module "lambda" {
   source_dir       = "../app/src"
   
   runtime         = "provided.al2023"
-  handler =       "handler.run"
+  handler         = "handler.run"
   architecture    = "arm64"
 
   memory_size     = 2048 # 1024 # 512 # 

@@ -29,6 +29,12 @@ Read the full analysis](https://cloudless.sh/log/lambda-container-images-beat-zi
 - **Real cold starts** - No artificial function updates that interfere with caching
 - **Comprehensive metrics** - Average, percentiles, and variance analysis
 
+## Complete Journey
+
+This research culminated in the definitive guide: [Shell Functions as Lambda: The Complete Journey to Sub-25ms Cold Starts](https://cloudless.sh/log/shell-functions-lambda-complete-journey/)
+
+The journey from pure Bash to optimized runtime layers, with complete performance data and architectural insights.
+
 ## Contributing
 
 Have ideas for Lambda performance tests? Open an issue or submit a PR with your benchmark scenario.
