@@ -26,6 +26,24 @@ init_data () {
          | cut -d' ' -f 3
 }
 
+duration_data () {
+    local SINCE="${1:-1m}"
+    local FUNCTION_NAME="${2:-$FUNCTION_NAME}"
+    local DATA="${3:-$(report "$SINCE" "$FUNCTION_NAME")}"
+    echo "$DATA" \
+        | pcre2grep -o '\tDuration: \K[\d.]+'
+        #  | cut -d' ' -f 3
+}
+
+billed_duration_data () {
+    local SINCE="${1:-1m}"
+    local FUNCTION_NAME="${2:-$FUNCTION_NAME}"
+    local DATA="${3:-$(report "$SINCE" "$FUNCTION_NAME")}"
+    echo "$DATA" \
+        | pcre2grep -o '\tBilled Duration: \K[\d.]+'
+        #  | cut -d' ' -f 3
+}
+
 init_stats () {
     local SINCE="${1:-1m}"
     local FUNCTION_NAME="${2:-$FUNCTION_NAME}"
@@ -81,17 +99,22 @@ benchmark () {
         --function-name "$FUNCTION_NAME" \
         --environment "Variables={BENCH_RUN=$SINCE}" 1>/dev/null 2>/dev/stdout
 
-    echo "Waiting 3s for config to propagate..."
+    echo "Waiting 3s for config to propagate..." >&2
     sleep 3 # wait for config to propagate
 
-    echo "Invoking function $FUNCTION_NAME concurrently..."
+    echo "Invoking function $FUNCTION_NAME concurrently..." >&2
     export FUNCTION_NAME
+    # seq 1 240 | parallel -j 100 "$INVOKE_SCRIPT"
     seq 1 120 | parallel -j 60 "$INVOKE_SCRIPT"
         # aws lambda invoke --function-name "$FUNCTION_NAME" /dev/stdout 1>/dev/null 2>/dev/stdout
 
-    echo "Waiting 30s for logs to propagate..."
+    echo "Waiting 30s for logs to propagate..." >&2
     sleep 10
     # echo "Since: $SINCE"
     echo "Init stats since $SINCE :"
-    init_stats "$SINCE" | tee "data/$FUNCTION_ALIAS-init-stats.json"
+    # init_stats "$SINCE" | tee "data/$FUNCTION_ALIAS-init-stats.json"
+    stats=$(init_data "$SINCE" | datamash --round 2 min 1 median 1 mean 1 perc:90 1 perc:99 1 max 1 iqr 1 count 1)
+    printf "min\tmedian\tmean\tp90\tp99\tmax\tiqr\tcount\n"
+    echo "$stats"
+    
 }
